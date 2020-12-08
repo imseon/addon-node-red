@@ -6,6 +6,14 @@
 
 declare -a npmlist
 
+# Executes commands before installing packages
+if bashio::config.has_value 'pre_commands'; then
+    while read -r cmd; do
+        eval "${cmd}" \
+            || bashio::exit.nok "Failed executing pre command: ${cmd}"
+    done <<< "$(bashio::config 'pre_commands')"
+fi
+
 # Install user configured/requested packages
 if bashio::config.has_value 'system_packages'; then
     apk update \
